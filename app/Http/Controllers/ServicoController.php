@@ -37,7 +37,7 @@ class ServicoController extends Controller
             } else {                    
                 $path = $arquivo->store('imagensServicos');
             }                  
-            $dados['urlImagem'] = $path;
+            $servico['urlImagem'] = $path;
           }
        }
        Servico::create($servico);

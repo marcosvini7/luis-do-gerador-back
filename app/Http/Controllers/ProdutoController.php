@@ -41,7 +41,7 @@ class ProdutoController extends Controller
             } else {                    
                 $path = $arquivo->store('imagensProdutos');
             }                  
-            $dados['urlImagem'] = $path; 
+            $produto['urlImagem'] = $path; 
           }
        }
        Produto::create($produto);       
