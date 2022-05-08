@@ -16,7 +16,7 @@ class LimitAcess
      */
     public function handle(Request $request, Closure $next)
     { 
-        if(env('APP_ENV')=='production') {
+        if(env('APP_ENV') == 'production') {
             $ipArray = ['127.0.0.1']; 
 
             if( in_array($request->ip(), $ipArray)){
