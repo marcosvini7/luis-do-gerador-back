@@ -36,8 +36,12 @@ class ProdutoController extends Controller
           $arquivo = $request->file('arquivo');
           $extensao = strtolower($arquivo->getClientOriginalExtension());
           if(in_array($extensao, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg', 'ico'])){
-              $path = $arquivo->store('imagensProdutos', 'public');
-              $produto['urlImagem'] = $path;
+            if(env('APP_ENV') == 'local'){
+                $path = $arquivo->store('imagensProdutos', 'public');
+            } else {                    
+                $path = $arquivo->store('imagensProdutos');
+            }                  
+            $dados['urlImagem'] = $path; 
           }
        }
        Produto::create($produto);       
@@ -70,9 +74,14 @@ class ProdutoController extends Controller
             $arquivo = $request->file('arquivo');
             $extensao = strtolower($arquivo->getClientOriginalExtension());
             if(in_array($extensao, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg', 'ico'])){
-                $path = $arquivo->store('imagensProdutos', 'public');
+                if(env('APP_ENV') == 'local'){
+                    $path = $arquivo->store('imagensProdutos', 'public');
+                    Storage::disk('public')->delete($produto->urlImagem);
+                } else {                    
+                    $path = $arquivo->store('imagensProdutos');
+                    Storage::delete($produto->urlImagem);
+                }                  
                 $dados['urlImagem'] = $path;
-                Storage::disk('public')->delete($produto->urlImagem);
             }
         } 
   
@@ -87,7 +96,11 @@ class ProdutoController extends Controller
      */
     public function destroy(Produto $produto)
     {
-        Storage::disk('public')->delete($produto->urlImagem);
+        if(env('APP_ENV') == 'local'){
+            Storage::disk('public')->delete($produto->urlImagem);
+        } else {                    
+            Storage::delete($produto->urlImagem);
+        }                  
         $produto->delete();
     }
 }

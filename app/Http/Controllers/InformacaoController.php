@@ -52,14 +52,19 @@ class InformacaoController extends Controller
     {
         $dados = json_decode($request->dados, true);
         $info = Informacao::find($id);
-        
+
         if($request->hasFile('arquivo')){
             $arquivo = $request->file('arquivo');
             $extensao = strtolower($arquivo->getClientOriginalExtension());
-            if(in_array($extensao, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg'])){                
-                $path = $arquivo->store('imagemHome', 'public');
-                $dados['urlImagem'] = $path;
-                Storage::disk('public')->delete($info->urlImagem);              
+            if(in_array($extensao, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg'])){  
+                if(env('APP_ENV') == 'local'){
+                    $path = $arquivo->store('imagemHome', 'public');
+                    Storage::disk('public')->delete($info->urlImagem);
+                } else {                    
+                    $path = $arquivo->store('imagemHome');
+                    Storage::delete($info->urlImagem);
+                }                  
+                $dados['urlImagem'] = $path;                                     
             }
         } 
   

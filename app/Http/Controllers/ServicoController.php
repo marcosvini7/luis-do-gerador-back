@@ -32,8 +32,12 @@ class ServicoController extends Controller
           $arquivo = $request->file('arquivo');
           $extensao = strtolower($arquivo->getClientOriginalExtension());
           if(in_array($extensao, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg', 'ico'])){
-              $path = $arquivo->store('imagensServicos', 'public');
-              $servico['urlImagem'] = $path;
+            if(env('APP_ENV') == 'local'){
+                $path = $arquivo->store('imagensServicos', 'public');
+            } else {                    
+                $path = $arquivo->store('imagensServicos');
+            }                  
+            $dados['urlImagem'] = $path;
           }
        }
        Servico::create($servico);
@@ -66,9 +70,14 @@ class ServicoController extends Controller
             $arquivo = $request->file('arquivo');
             $extensao = strtolower($arquivo->getClientOriginalExtension());
             if(in_array($extensao, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg', 'ico'])){
-                $path = $arquivo->store('imagensServicos', 'public');
+                if(env('APP_ENV') == 'local'){
+                    $path = $arquivo->store('imagensServicos', 'public');
+                    Storage::disk('public')->delete($servico->urlImagem);
+                } else {                    
+                    $path = $arquivo->store('imagensServicos');
+                    Storage::delete($servico->urlImagem);
+                }                  
                 $dados['urlImagem'] = $path;
-                Storage::disk('public')->delete($servico->urlImagem);
             }
         } 
   
@@ -83,7 +92,11 @@ class ServicoController extends Controller
      */
     public function destroy(Servico $servico)
     {
-        Storage::disk('public')->delete($servico->urlImagem);
+        if(env('APP_ENV') == 'local'){
+            Storage::disk('public')->delete($servico->urlImagem);
+        } else {                    
+            Storage::delete($servico->urlImagem);
+        }                  
         $servico->delete();
     }
 }
