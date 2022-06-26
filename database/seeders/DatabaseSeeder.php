@@ -27,9 +27,9 @@ class DatabaseSeeder extends Seeder
         ]);
        
         DB::table('users')->insert([
-            'name' => 'Luis',
-            'email' => 'luisdosgeradores@gmail.com',
-            'password' => sha1('cavalo93') 
+            'name' => 'teste',
+            'email' => 'teste@gmail.com',
+            'password' => sha1('teste') 
         ]);
     }
 }
